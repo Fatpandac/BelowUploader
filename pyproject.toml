@@ -1,0 +1,10 @@
+[project]
+name = "below-uploader"
+version = "0.1.0"
+description = "Uploader for Below to influxDB"
+authors = ["Fatpandac <i@fatpandac.com>"]
+dependencies = [
+  "python-dotenv>=1.2.1",
+  "influxdb-client>=1.49.0"
+]
+requires-python = ">=3.13"
