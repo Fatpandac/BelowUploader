@@ -1,6 +1,6 @@
 # BelowUploader
 
-BelowUploader is a Python tool that uploads dump data to [InfluxDB](https://www.influxdata.com/) and enables data visualization via [Grafana](https://grafana.com/).
+BelowUploader is a Python tool that uploads [below](https://github.com/facebookincubator/below) dump data to [InfluxDB](https://www.influxdata.com/) and enables data visualization via [Grafana](https://grafana.com/).
 
 ## Quick Start
 
@@ -30,8 +30,6 @@ UPLOAD_INTERVAL_SECONDS=5                 # Data upload interval in seconds.
 ```bash
 uv run main.py
 ```
-
----
 
 ## Visualization with Grafana
 
