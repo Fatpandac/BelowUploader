@@ -1,8 +1,9 @@
 import os, csv
-from datetime import datetime
 from enum import Enum
-from influxdb_client.client.write_api import SYNCHRONOUS
-from influxdb_client import WriteApi, InfluxDBClient
+from datetime import datetime
+from influxdb_client.client.write_api import SYNCHRONOUS, WriteApi
+from influxdb_client.client.influxdb_client import InfluxDBClient
+
 
 class FieldType(Enum):
     STRING = "string"
@@ -22,10 +23,20 @@ class Uploader:
     write_api: WriteApi
 
     def __init__(self):
-        self.token = os.getenv("INFLUXDB_TOKEN")
-        self.bucket = os.getenv("INFLUXDB_BUCKET")
-        self.org = os.getenv("INFLUXDB_ORG")
-        self.url = os.getenv("INFLUXDB_URL")
+        (token, bucket, org, url) = (
+            os.getenv("INFLUXDB_TOKEN"),
+            os.getenv("INFLUXDB_BUCKET"),
+            os.getenv("INFLUXDB_ORG"),
+            os.getenv("INFLUXDB_URL"),
+        )
+        if not token or not bucket or not org or not url:
+            raise ValueError(
+                "INFLUXDB_TOKEN, INFLUXDB_BUCKET, INFLUXDB_ORG, and INFLUXDB_URL environment variables must be set"
+            )
+        self.org = org
+        self.url = url
+        self.token = token
+        self.bucket = bucket
         self.interval = int(os.getenv("UPLOAD_INTERVAL_SECONDS", "60"))
         write_client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
         self.write_api = write_client.write_api(write_options=SYNCHRONOUS)
@@ -50,10 +61,16 @@ class Uploader:
             FieldType.STRING: lambda v: f'"{self.escape_string_value(v)}"',
         }
 
-        return f'{switcher[field_type](value)}'
+        return f"{switcher[field_type](value)}"
 
     def format_key(self, key: str) -> str:
-        return key.strip().replace("(", "_").replace(")", "").replace("/", "_").replace(" ", "_")
+        return (
+            key.strip()
+            .replace("(", "_")
+            .replace(")", "")
+            .replace("/", "_")
+            .replace(" ", "_")
+        )
 
     def csv_to_line_protocol(
         self,
@@ -65,10 +82,9 @@ class Uploader:
         reader = csv.DictReader(raw_csv.splitlines())
         lines = []
         for row in reader:
-            try:
-                timestamp = int(row.get("Timestamp")) * 1_000_000_000
-            except (TypeError, ValueError):
-                timestamp = int(datetime.now().timestamp()) * 1_000_000_000
+            timestamp = (
+                int(row.get("Timestamp") or datetime.now().timestamp()) * 1_000_000_000
+            )
 
             tags_str = []
             for tag in tags:
@@ -84,7 +100,9 @@ class Uploader:
                         f"{self.format_key(field_name)}={self.format_value(row[field_name], field_type)}"
                     )
 
-            line = f"{measurement},{','.join(tags_str)} {','.join(field_str)} {timestamp}"
+            line = (
+                f"{measurement},{','.join(tags_str)} {','.join(field_str)} {timestamp}"
+            )
             lines.append(line)
 
         return lines

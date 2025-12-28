@@ -8,7 +8,16 @@ class DiskStatsUploader(Uploader):
         super().__init__()
 
     def collect(self):
-        cmd = ["below", "dump", "disk", "--begin", f"{self.interval}s", "--raw", "-O", "csv"]
+        cmd = [
+            "below",
+            "dump",
+            "disk",
+            "--begin",
+            f"{self.interval}s",
+            "--raw",
+            "-O",
+            "csv",
+        ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             print("Error collecting disk stats:", result.stderr)

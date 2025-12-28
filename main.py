@@ -25,7 +25,7 @@ def main():
         start_time = time.time()
         for uploader_instance in uploader:
             uploader_instance.collect_and_upload()
-        print("All uploaders have completed their tasks.")
+        print("All uploads complete.")
 
         elapsed_time = time.time() - start_time
         sleep_time = max(0, upload_interval - elapsed_time)

@@ -8,7 +8,17 @@ class SystemStatsUploader(Uploader):
         super().__init__()
 
     def collect(self):
-        cmd = ["below", "dump", "system", "-d", "--begin", f"{self.interval}s", "--raw", "-O", "csv"]
+        cmd = [
+            "below",
+            "dump",
+            "system",
+            "-d",
+            "--begin",
+            f"{self.interval}s",
+            "--raw",
+            "-O",
+            "csv",
+        ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             print("Error collecting system stats:", result.stderr)
