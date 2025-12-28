@@ -63,9 +63,11 @@ class Uploader:
         reader = csv.DictReader(raw_csv.splitlines())
         lines = []
         for row in reader:
-            timestamp = (
-                int(row.get("Timestamp", datetime.now().timestamp())) * 1_000_000_000
-            )
+            try:
+                timestamp = int(row.get("Timestamp")) * 1_000_000_000
+            except (TypeError, ValueError):
+                timestamp = int(datetime.now().timestamp()) * 1_000_000_000
+
             tags_str = []
             for tag in tags:
                 if tag in row:
