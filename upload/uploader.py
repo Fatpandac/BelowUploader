@@ -87,18 +87,16 @@ class Uploader:
             )
 
             tags_str = []
-            for tag in tags:
-                if tag in row:
-                    tags_str.append(
-                        f"{self.format_key(tag)}={self.escape_string_value(row[tag])}"
-                    )
+            for tag in filter(lambda t: t in row, tags):
+                tags_str.append(
+                    f"{self.format_key(tag)}={self.escape_string_value(row[tag])}"
+                )
             field_str = []
-            for field in fields:
+            for field in filter(lambda x: x[0] in row, fields):
                 (field_name, field_type) = field
-                if field_name in row:
-                    field_str.append(
-                        f"{self.format_key(field_name)}={self.format_value(row[field_name], field_type)}"
-                    )
+                field_str.append(
+                    f"{self.format_key(field_name)}={self.format_value(row[field_name], field_type)}"
+                )
 
             line = (
                 f"{measurement},{','.join(tags_str)} {','.join(field_str)} {timestamp}"
@@ -111,5 +109,7 @@ class Uploader:
         resp = self.write_api.write(
             bucket=self.bucket, org=self.org, record="\n".join(lines)
         )
+        measurement = lines[0].split(",")[0] if lines else "unknown"
         if resp is None:
-            print(f"Uploaded {len(lines)} lines to InfluxDB")
+            print(f"Uploaded {measurement} {len(lines)} lines to InfluxDB")
+            
