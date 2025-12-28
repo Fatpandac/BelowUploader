@@ -3,10 +3,6 @@ from datetime import datetime
 from enum import Enum
 from influxdb_client.client.write_api import SYNCHRONOUS
 from influxdb_client import WriteApi, InfluxDBClient
-from dotenv import load_dotenv
-
-load_dotenv(dotenv_path=".env")
-
 
 class FieldType(Enum):
     STRING = "string"
@@ -18,13 +14,17 @@ type Field = tuple[str, FieldType]
 
 
 class Uploader:
-    token: str = os.getenv("INFLUXDB_TOKEN")
-    bucket: str = os.getenv("INFLUXDB_BUCKET")
-    org: str = os.getenv("INFLUXDB_ORG")
-    url: str = os.getenv("INFLUXDB_URL")
+    token: str
+    bucket: str
+    org: str
+    url: str
     write_api: WriteApi
 
     def __init__(self):
+        self.token = os.getenv("INFLUXDB_TOKEN")
+        self.bucket = os.getenv("INFLUXDB_BUCKET")
+        self.org = os.getenv("INFLUXDB_ORG")
+        self.url = os.getenv("INFLUXDB_URL")
         write_client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
         self.write_api = write_client.write_api(write_options=SYNCHRONOUS)
 

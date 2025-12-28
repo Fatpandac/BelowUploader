@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from upload import DiskStatsUploader, SystemStatsUploader, ProcessStatsUploader
 
-load_dotenv(dotenv_path=".env")
+load_dotenv()
 
 def main():
     upload_interval = int(os.getenv("UPLOAD_INTERVAL_SECONDS", 5))
