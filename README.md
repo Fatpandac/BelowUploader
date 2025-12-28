@@ -43,6 +43,7 @@ You can use Grafana to visualize the data stored in InfluxDB:
 
 > Example Grafana Panel  
 > ![Grafana Example](/assets/grafana_example.png)
+> You can use this example by the following [Grafana Dashboard JSON](./assets/grafana_dashboard.json).
 
 ## Contribution
 
