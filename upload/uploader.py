@@ -18,6 +18,7 @@ class Uploader:
     bucket: str
     org: str
     url: str
+    interval: int
     write_api: WriteApi
 
     def __init__(self):
@@ -25,6 +26,7 @@ class Uploader:
         self.bucket = os.getenv("INFLUXDB_BUCKET")
         self.org = os.getenv("INFLUXDB_ORG")
         self.url = os.getenv("INFLUXDB_URL")
+        self.interval = int(os.getenv("UPLOAD_INTERVAL_SECONDS", "60"))
         write_client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
         self.write_api = write_client.write_api(write_options=SYNCHRONOUS)
 
