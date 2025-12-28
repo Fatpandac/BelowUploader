@@ -53,7 +53,7 @@ class Uploader:
         return f'{switcher[field_type](value)}'
 
     def format_key(self, key: str) -> str:
-        return key.strip().replace("(", "_").replace(")", "").replace(" ", "_")
+        return key.strip().replace("(", "_").replace(")", "").replace("/", "_").replace(" ", "_")
 
     def csv_to_line_protocol(
         self,
