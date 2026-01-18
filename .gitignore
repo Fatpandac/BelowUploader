@@ -92,6 +92,7 @@ venv.bak/
 # dotenv file (often contains secrets)
 .env
 .env.*
+!.env.example
 
 # logs
 *.log
