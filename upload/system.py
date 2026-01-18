@@ -1,6 +1,32 @@
+from enum import Enum
 import subprocess
 
 from upload.uploader import Uploader, FieldType
+
+
+class SystemStatTags(Enum):
+    HOSTNAME = ("Hostname", FieldType.STRING)
+    USAGE = ("Usage", FieldType.FLOAT)
+    SYSTEM = ("System", FieldType.FLOAT)
+    USER = ("User", FieldType.FLOAT)
+    TOTAL = ("Total", FieldType.INTEGER)
+    FREE = ("Free", FieldType.INTEGER)
+    AVAILABLE = ("Available", FieldType.INTEGER)
+    PAGE_IN = ("Page In", FieldType.FLOAT)
+    PAGE_OUT = ("Page Out", FieldType.FLOAT)
+    SWAP_IN = ("Swap In", FieldType.FLOAT)
+    SWAP_OUT = ("Swap Out", FieldType.FLOAT)
+    PGSTEAL_KSWAPD = ("Pgsteal Kswapd", FieldType.FLOAT)
+    PGSTEAL_DIRECT = ("Pgsteal Direct", FieldType.FLOAT)
+    PGSCAN_KSWAPD = ("Pgscan Kswapd", FieldType.FLOAT)
+    PGSCAN_DIRECT = ("Pgscan Direct", FieldType.FLOAT)
+    OOM_KILLS = ("OOM Kills", FieldType.FLOAT)
+    TOTAL_INTERRUPTS = ("Total Interrupts", FieldType.INTEGER)
+    CONTEXT_SWITCHES = ("Context Switches", FieldType.INTEGER)
+    BOOT_TIME_EPOCH = ("Boot Time Epoch", FieldType.INTEGER)
+    TOTAL_PROCS = ("Total Procs", FieldType.INTEGER)
+    RUNNING_PROCS = ("Running Procs", FieldType.FLOAT)
+    BLOCKED_PROCS = ("Blocked Procs", FieldType.FLOAT)
 
 
 class SystemStatsUploader(Uploader):
@@ -29,32 +55,14 @@ class SystemStatsUploader(Uploader):
         raw_data = self.collect()
         if raw_data is None:
             return
+        upload_tags = self.get_upload_tags(
+            "SYSTEM_UPLOAD_TAGS",
+            SystemStatTags,
+        )
         formatted_data = self.csv_to_line_protocol(
             raw_data,
             "system_stats",
             ["Hostname"],
-            [
-                ("Usage", FieldType.FLOAT),
-                ("User", FieldType.FLOAT),
-                ("System", FieldType.FLOAT),
-                ("Total", FieldType.INTEGER),
-                ("Free", FieldType.INTEGER),
-                ("Available", FieldType.INTEGER),
-                ("Page In", FieldType.FLOAT),
-                ("Page Out", FieldType.FLOAT),
-                ("Swap In", FieldType.FLOAT),
-                ("Swap Out", FieldType.FLOAT),
-                ("Pgsteal Kswapd", FieldType.FLOAT),
-                ("Pgsteal Direct", FieldType.FLOAT),
-                ("Pgscan Kswapd", FieldType.FLOAT),
-                ("Pgscan Direct", FieldType.FLOAT),
-                ("OOM Kills", FieldType.FLOAT),
-                ("Total Interrupts", FieldType.INTEGER),
-                ("Context Switches", FieldType.INTEGER),
-                ("Boot Time Epoch", FieldType.INTEGER),
-                ("Total Procs", FieldType.INTEGER),
-                ("Running Procs", FieldType.FLOAT),
-                ("Blocked Procs", FieldType.FLOAT),
-            ],
+            upload_tags,
         )
         self.upload_lines(formatted_data)

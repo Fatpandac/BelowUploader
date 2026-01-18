@@ -1,6 +1,31 @@
+from enum import Enum
 import subprocess
 
 from upload.uploader import Uploader, FieldType
+
+
+class DiskStatTags(Enum):
+    DISK = ("Disk", FieldType.STRING)
+    MAJOR = ("Major", FieldType.INTEGER)
+    MINOR = ("Minor", FieldType.INTEGER)
+    READ = ("Read", FieldType.FLOAT)
+    READ_COMPLETED = ("Read Completed", FieldType.INTEGER)
+    READ_MERGED = ("Read Merged", FieldType.INTEGER)
+    READ_SECTORS = ("Read Sectors", FieldType.INTEGER)
+    TIME_SPEND_READ = ("Time Spend Read", FieldType.INTEGER)
+    WRITE = ("Write", FieldType.FLOAT)
+    WRITE_COMPLETED = ("Write Completed", FieldType.INTEGER)
+    WRITE_MERGED = ("Write Merged", FieldType.INTEGER)
+    WRITE_SECTORS = ("Write Sectors", FieldType.INTEGER)
+    TIME_SPEND_WRITE = ("Time Spend Write", FieldType.INTEGER)
+    DISCARD = ("Discard", FieldType.FLOAT)
+    DISCARD_COMPLETED = ("Discard Completed", FieldType.INTEGER)
+    DISCARD_MERGED = ("Discard Merged", FieldType.INTEGER)
+    DISCARD_SECTORS = ("Discard Sectors", FieldType.INTEGER)
+    TIME_SPEND_DISCARD = ("Time Spend Discard", FieldType.INTEGER)
+    DISK_USAGE = ("Disk Usage", FieldType.FLOAT)
+    PARTITION_SIZE = ("Partition Size", FieldType.INTEGER)
+    FILESYSTEM_TYPE = ("Filesystem Type", FieldType.STRING)
 
 
 class DiskStatsUploader(Uploader):
@@ -28,32 +53,11 @@ class DiskStatsUploader(Uploader):
         raw_data = self.collect()
         if raw_data is None:
             return
+        upload_tags = self.get_upload_tags(
+            "DISK_UPLOAD_TAGS",
+            DiskStatTags,
+        )
         formatted_data = self.csv_to_line_protocol(
-            raw_data,
-            "disk_stats",
-            ["Name"],
-            [
-                ("Disk", FieldType.STRING),
-                ("Major", FieldType.INTEGER),
-                ("Minor", FieldType.INTEGER),
-                ("Read", FieldType.FLOAT),
-                ("Read Completed", FieldType.INTEGER),
-                ("Read Merged", FieldType.INTEGER),
-                ("Read Sectors", FieldType.INTEGER),
-                ("Time Spend Read", FieldType.INTEGER),
-                ("Write", FieldType.FLOAT),
-                ("Write Completed", FieldType.INTEGER),
-                ("Write Merged", FieldType.INTEGER),
-                ("Write Sectors", FieldType.INTEGER),
-                ("Time Spend Write", FieldType.INTEGER),
-                ("Discard", FieldType.FLOAT),
-                ("Discard Completed", FieldType.INTEGER),
-                ("Discard Merged", FieldType.INTEGER),
-                ("Discard Sectors", FieldType.INTEGER),
-                ("Time Spend Discard", FieldType.INTEGER),
-                ("Disk Usage", FieldType.FLOAT),
-                ("Partition Size", FieldType.INTEGER),
-                ("Filesystem Type", FieldType.STRING),
-            ],
+            raw_data, "disk_stats", ["Name"], upload_tags
         )
         self.upload_lines(formatted_data)

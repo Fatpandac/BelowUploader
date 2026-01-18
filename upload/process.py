@@ -1,6 +1,22 @@
+from enum import Enum
 import subprocess
 
 from upload.uploader import Uploader, FieldType
+
+
+class ProcessStatTags(Enum):
+    PPID = ("Ppid", FieldType.INTEGER)
+    PID = ("Pid", FieldType.INTEGER)
+    COMM = ("Comm", FieldType.STRING)
+    STATE = ("State", FieldType.STRING)
+    CPU = ("CPU", FieldType.FLOAT)
+    RSS = ("RSS", FieldType.INTEGER)
+    READS = ("Reads", FieldType.FLOAT)
+    WRITES = ("Writes", FieldType.FLOAT)
+    UPTIME = ("Uptime(sec)", FieldType.FLOAT)
+    CGROUP = ("Cgroup", FieldType.STRING)
+    CMDLINE = ("Cmdline", FieldType.STRING)
+    EXE_PATH = ("Exe Path", FieldType.STRING)
 
 
 class ProcessStatsUploader(Uploader):
@@ -28,21 +44,14 @@ class ProcessStatsUploader(Uploader):
         raw_data = self.collect()
         if raw_data is None:
             return
+        upload_tags = self.get_upload_tags(
+            "PROCESS_UPLOAD_TAGS",
+            ProcessStatTags,
+        )
         formatted_data = self.csv_to_line_protocol(
             raw_data,
             "process_stats",
             ["Pid", "Comm"],
-            [
-                ("Ppid", FieldType.INTEGER),
-                ("State", FieldType.STRING),
-                ("CPU", FieldType.FLOAT),
-                ("RSS", FieldType.INTEGER),
-                ("Reads", FieldType.FLOAT),
-                ("Writes", FieldType.FLOAT),
-                ("Uptime(sec)", FieldType.FLOAT),
-                ("Cgroup", FieldType.STRING),
-                ("Cmdline", FieldType.STRING),
-                ("Exe Path", FieldType.STRING),
-            ],
+            upload_tags,
         )
         self.upload_lines(formatted_data)

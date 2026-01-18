@@ -1,3 +1,4 @@
+from encodings.idna import ToUnicode
 import os, csv
 from enum import Enum
 from datetime import datetime
@@ -112,4 +113,17 @@ class Uploader:
         measurement = lines[0].split(",")[0] if lines else "unknown"
         if resp is None:
             print(f"Uploaded {measurement} {len(lines)} lines to InfluxDB")
-            
+
+    def get_upload_tags(
+        self,
+        envName: str,
+        StatTags,
+    ) -> list[Field]:
+        upload_tags = os.getenv(envName)
+        if upload_tags:
+            selected_tags = set(tag.strip() for tag in upload_tags.split(","))
+            StatTagsFiltered = [tag for tag in StatTags if tag.name in selected_tags]
+        else:
+            StatTagsFiltered = list(StatTags)
+
+        return [(tag.value[0], tag.value[1]) for tag in StatTagsFiltered]
